@@ -1,3 +1,4 @@
+library(rhandsontable)
 library(shiny)
 
 shinyUI(fluidPage(
