@@ -45,7 +45,8 @@ shinyServer(function(input, output) {
         if(input$prior_dist == "Normal"){
             samp <- rnorm(50000, input$prior_median, input$prior_spread)
         }else{
-            samp <- exp(rnorm(50000, log(input$prior_median), input$prior_spread))
+            p <- log_normal_transform_params(input$prior_median, input$prior_spread)
+            samp <- exp(rnorm(50000, p$mu, p$sigma))
         }
         if(valid_numeric(input$prior_lower))
             samp <- samp[samp >= input$prior_lower]
@@ -57,19 +58,31 @@ shinyServer(function(input, output) {
         ggplot() + geom_histogram(aes(x=samp), bins=100)
     })
     
-    output$prior_quant <- renderPrint({
+    output$prior_quant <- renderTable({
         if(is.null(prior_samp()))
             return(NULL)
-        print(quantile(prior_samp(), probs = (1:19)/20))
+        q <- t(as.matrix(quantile(prior_samp(), probs = c(.05,.1,.2,.3,.4,.5,.6,.7,.8,.9,.95))))
+        as.data.frame(q)
+    })
+    
+    output$prior_summaries <- renderTable({
+        if(is.null(prior_samp()))
+            return(NULL)
+        s <- prior_samp()
+        data.frame(Median=median(s), Mean=mean(s), `Standard Deviation`=sd(s))
     })
     
     observeEvent(input$run,{
         if(!valid_numeric(input$prior_median) || !valid_numeric(input$prior_spread))
             return(NULL)
+        id <- showNotification("Running...", duration = NULL)
         med <- input$prior_median
+        sigma <- input$prior_spread
         log_normal <- input$prior_dist == "Log-Normal"
         if(log_normal){
-            med <- log(med)
+            p <- log_normal_transform_params(input$prior_median, input$prior_spread)
+            med <- p$mu
+            sigma <- p$sigma
         }
         df <- hot_to_r(input$hot)
         df <- df[!is.na(df[[1]]),]
@@ -84,19 +97,53 @@ shinyServer(function(input, output) {
             df[,2],
             df[,3] / 100, 
             med, 
-            input$prior_spread, 
+            sigma, 
             low, 
             high,
             log_normal)
+        
         output$post_plot <- renderPlot({
-            hist(theta)
+            df <- rbind(data.frame(`Population Value`=theta, Distribution="Posterior"), data.frame(`Population Value`=isolate(prior_samp()), Distribution="Prior"))
+            qplot(x= Population.Value, color=Distribution, data=df, geom="density",trim=TRUE) + 
+                ylab("Density") + 
+                scale_y_continuous(breaks=c()) + 
+                theme_bw()
         })
         output$post_quant <- renderTable({
-            q <- t(as.matrix(quantile(theta, probs = (1:19)/20)))
+            q <- t(as.matrix(quantile(theta, probs = c(.05,.1,.2,.3,.4,.5,.6,.7,.8,.9,.95))))
             
             as.data.frame(q)
         })
+        
+        output$post_summaries <- renderTable({
+            if(is.null(prior_samp()))
+                return(NULL)
+            s <- theta
+            ci <- paste0("(", format(quantile(theta, .025), digits=2), ", ",format(quantile(theta, .975), digits=2),")")
+            ci2 <- paste0("(", format(quantile(theta, .05), digits=2), ", ",format(quantile(theta, .95), digits=2),")")
+            data.frame(Median=median(s), Mean=mean(s), `Standard Deviation`=sd(s), `95% CI`=ci, `90% CI`=ci2, check.names = FALSE)
+        })
+        
+        output$input <- renderPrint(isolate({
+            med <- input$prior_median
+            sigma <- input$prior_spread
+            log_normal <- input$prior_dist == "Log-Normal"
+            if(log_normal){
+                p <- log_normal_transform_params(input$prior_median, input$prior_spread)
+                med <- p$mu
+                sigma <- p$sigma
+            }
+            cat("Prior: ",input$prior_dist, " : mu = ", med, " : sigma = ", sigma,"\n")
+            cat("Prior Bounds: lower = ", input$prior_lower, " : upper = ", input$prior_upper,"\n")
+            cat("Data:\n")
+            df <- hot_to_r(input$hot)
+            df <- df[!is.na(df[[1]]),]
+            print(df)
+            
+        }))
+        
+        removeNotification(id)
     })
-    
+
     
 })
