@@ -1,0 +1,26 @@
+City/Country,Population ,Provider,Estimate,Lower,Upper,Type,Notes
+Mauritius,IDU,Centre de Solidarite,10444,4102,16789,Estimate,
+Mauritius,IDU,Help de-addiction,5699,3680,7721,Estimate,
+Mauritius,IDU,Sewa Sadan Sangram,10315,5801,14832,Estimate,
+Mauritius,IDU,Dr I. Goomany Centre,7182,5237,9130,Estimate,
+Mauritius,IDU,Needle Exchange,8866,7880,9853,Estimate,
+Mauritius,FSW,Chrysalide,424,241,610,Estimate,
+Mauritius,FSW,Lacaz A,254,141,370,Estimate,
+Mauritius,FSW,AIDS Unit,945,745,1148,Estimate,
+Mauritius,FSW,Prevention Information Lutte Contre Le Sida,910,702,1119,Estimate,
+San Francisco,IDU 2005,Reported HIV Cases,23779,16027,31534,Estimate,
+San Francisco,IDU 2005,The UFO Study,10158,3237,17044,Estimate,
+San Francisco,IDU 2005,Arrests in 2005,20909,14960,26861,Estimate,
+San Francisco,IDU 2005,Walden House,10130,2998,17263,Estimate,
+San Francisco,IDU 2009,Reported HIV Cases,45315,24576,66057,Estimate,
+San Francisco,IDU 2009,Walden House,5200,1003,9398,Estimate,
+San Francisco,IDU 2009,Emergency Room,18250,4675,31826,Estimate,
+San Francisco,IDU 2009,Anonymous Testing Sites,12857,,,Estimate,
+San Francisco,IDU 2009,STI clinic HIV testing,81500,658,162343,Estimate,
+San Francisco,IDU 2009,STI clinic STI testing,7000,2945,11056,Estimate,
+Mauritius,IDU,Prior_raw,17500,17000,18000,Prior,2004 from Mathers et al
+Mauritius,IDU,Prior_pct,0.0207,0.0201,0.0213,Prior,2004 from Mathers et al
+San Francisco,IDU 2005,Prior_raw,20219,13998,25663,Prior,Lansky et al via Wesson
+San Francisco,IDU 2005,Prior_pct,0.026,0.018,0.033,Prior,Lansky et al via Wesson
+San Francisco,IDU 2009,Prior_raw,20219,13998,25663,Prior,Lansky et al via Wesson
+San Francisco,IDU 2009,Prior_pct,0.026,0.018,0.033,Prior,Lansky et al via Wesson
