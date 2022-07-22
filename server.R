@@ -13,10 +13,31 @@ shinyServer(function(input, output) {
     values <- reactiveValues()
     null_df <- data.frame(
         Estimate = as.numeric(rep(NA,10)), 
-        `Standard Error` = as.numeric(rep(NA,10)), 
+        `Lower` = as.numeric(rep(NA,10)), 
+        `Upper` = as.numeric(rep(NA,10)), 
+        #`Standard Error` = as.numeric(rep(NA,10)), 
         `Design Confidence` = as.numeric(rep(100,10)),
         check.names = FALSE)
     values[["DF"]] <- null_df
+    
+    get_transform <- function(){
+        if(input$transform == "None")
+            tf <- function(x) x
+        else if(input$transform == "Log")
+            tf <- log
+        else 
+            tf <-  function(x) log(x/(1-x))
+        tf
+    }
+    get_inv_transform <- function(){
+        if(input$transform == "None")
+            tf <- function(x) x
+        else if(input$transform == "Log")
+            tf <- exp
+        else 
+            tf <-  function(x) exp(x) / (1 + exp(x))
+        tf
+    }
     ## Handsontable
     observe({
         if (!is.null(input$hot)) {
@@ -40,20 +61,23 @@ shinyServer(function(input, output) {
     
     prior_samp <- reactiveVal()
     output$prior <- renderPlot({
-        if(!valid_numeric(input$prior_median) || !valid_numeric(input$prior_spread))
+        if(!valid_numeric(input$prior_median) || !valid_numeric(input$prior_q75))
             return(NULL)
-        if(input$prior_dist == "Normal"){
-            samp <- rnorm(50000, input$prior_median, input$prior_spread)
-        }else{
-            p <- log_normal_transform_params(input$prior_median, input$prior_spread)
-            samp <- exp(rnorm(50000, p$mu, p$sigma))
-        }
+        transform <- get_transform()
+        inv_transform <- get_inv_transform()
+        
+        med <- transform(input$prior_median)
+        q75 <- transform(input$prior_q75)
+        prior_sd <- (q75 - med) / .674
+        
+        samp <- rnorm(50000, med, prior_sd)
         if(valid_numeric(input$prior_lower))
-            samp <- samp[samp >= input$prior_lower]
+            samp <- samp[samp >= transform(input$prior_lower)]
         if(valid_numeric(input$prior_upper))
-            samp <- samp[samp <= input$prior_upper]
+            samp <- samp[samp <= transform(input$prior_upper)]
         #if(length(samp) < 2)
         #    return(NULL)
+        samp <- inv_transform(samp)
         prior_samp(samp)
         ggplot() + geom_histogram(aes(x=samp), bins=100)
     })
@@ -73,34 +97,36 @@ shinyServer(function(input, output) {
     })
     
     observeEvent(input$run,{
-        if(!valid_numeric(input$prior_median) || !valid_numeric(input$prior_spread))
+        if(!valid_numeric(input$prior_median) || !valid_numeric(input$prior_q75))
             return(NULL)
         id <- showNotification("Running...", duration = NULL)
-        med <- input$prior_median
-        sigma <- input$prior_spread
-        log_normal <- input$prior_dist == "Log-Normal"
-        if(log_normal){
-            p <- log_normal_transform_params(input$prior_median, input$prior_spread)
-            med <- p$mu
-            sigma <- p$sigma
-        }
+        
+        transform <- get_transform()
+        inv_transform <- get_inv_transform()
+        
+        prior_med <- transform(input$prior_median)
+        prior_q75 <- transform(input$prior_q75)
+        prior_sd <- (prior_q75 -prior_med) / .674
         df <- hot_to_r(input$hot)
         df <- df[!is.na(df[[1]]),]
+        yhat <- transform(df[,1])
+        yhat_sd <- (transform(df[,3]) - transform(df[,2])) / (2 * 1.96)
+        conf <- df[,4] / 100
         low <- -Inf
         high <- Inf
         if(valid_numeric(input$prior_lower))
-            low <- input$prior_lower
+            low <- transform(input$prior_lower)
         if(valid_numeric(input$prior_upper))
-            high <- input$prior_upper
+            high <- transform(input$prior_upper)
         theta <- combine_estimates_stan(
-            df[,1],
-            df[,2],
-            df[,3] / 100, 
-            med, 
-            sigma, 
+            yhat,
+            yhat_sd,
+            conf, 
+            prior_med, 
+            prior_sd, 
             low, 
-            high,
-            log_normal)
+            high)
+        theta <- inv_transform(theta)
         
         output$post_plot <- renderPlot({
             df <- rbind(data.frame(`Population Value`=theta, Distribution="Posterior"), data.frame(`Population Value`=isolate(prior_samp()), Distribution="Prior"))
@@ -127,13 +153,8 @@ shinyServer(function(input, output) {
         output$input <- renderPrint(isolate({
             med <- input$prior_median
             sigma <- input$prior_spread
-            log_normal <- input$prior_dist == "Log-Normal"
-            if(log_normal){
-                p <- log_normal_transform_params(input$prior_median, input$prior_spread)
-                med <- p$mu
-                sigma <- p$sigma
-            }
-            cat("Prior: ",input$prior_dist, " : mu = ", med, " : sigma = ", sigma,"\n")
+            cat("Transform:", input$transform,"\n")
+            cat("Prior: "," : mu = ", med, " : sigma = ", sigma,"\n")
             cat("Prior Bounds: lower = ", input$prior_lower, " : upper = ", input$prior_upper,"\n")
             cat("Data:\n")
             df <- hot_to_r(input$hot)
