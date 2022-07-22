@@ -53,9 +53,16 @@ shinyUI(fluidPage(
             "Synthesis",
             sidebarLayout(
                 sidebarPanel(
+                    numericInput(
+                        "multi",
+                        "Multiplier",
+                        .01
+                    ),
                     actionButton("run","Run")
                 ),
                 mainPanel(
+                    #p("% Variance Due to Unaccounted for Non-Sampling Error:"),
+                    textOutput("pooling"),
                     p("Consensus Estimate:"),
                     tableOutput("post_summaries"),
                     p("Posterior:"),

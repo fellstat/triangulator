@@ -118,15 +118,28 @@ shinyServer(function(input, output) {
             low <- transform(input$prior_lower)
         if(valid_numeric(input$prior_upper))
             high <- transform(input$prior_upper)
-        theta <- combine_estimates_stan(
+        multi <- input$multi
+        post <- combine_estimates_stan(
             yhat,
             yhat_sd,
             conf, 
             prior_med, 
             prior_sd, 
             low, 
-            high)
+            high,
+            multi)
+        
+        theta <- post$theta
         theta <- inv_transform(theta)
+        lambda <- rsq_lambda(yhat,yhat_sd, post$theta, post$tau)$lambda
+        
+        output$pooling <- renderText({
+            paste0(
+                "% Variance Due to Unaccounted for Non-Sampling Error: ",
+                round(100*lambda),
+                "%"
+                )
+        })
         
         output$post_plot <- renderPlot({
             df <- rbind(data.frame(`Population Value`=theta, Distribution="Posterior"), data.frame(`Population Value`=isolate(prior_samp()), Distribution="Prior"))
@@ -152,9 +165,8 @@ shinyServer(function(input, output) {
         
         output$input <- renderPrint(isolate({
             med <- input$prior_median
-            sigma <- input$prior_spread
             cat("Transform:", input$transform,"\n")
-            cat("Prior: "," : mu = ", med, " : sigma = ", sigma,"\n")
+            cat("Prior: "," : mu = ", med, " : q75 = ", input$prior_q75,"\n")
             cat("Prior Bounds: lower = ", input$prior_lower, " : upper = ", input$prior_upper,"\n")
             cat("Data:\n")
             df <- hot_to_r(input$hot)
