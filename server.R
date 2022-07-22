@@ -12,11 +12,11 @@ shinyServer(function(input, output) {
     
     values <- reactiveValues()
     null_df <- data.frame(
-        Estimate = as.numeric(rep(NA,10)), 
-        `Lower` = as.numeric(rep(NA,10)), 
-        `Upper` = as.numeric(rep(NA,10)), 
+        Estimate = as.numeric(rep(NA,20)), 
+        `Lower` = as.numeric(rep(NA,20)), 
+        `Upper` = as.numeric(rep(NA,20)), 
         #`Standard Error` = as.numeric(rep(NA,10)), 
-        `Design Confidence` = as.numeric(rep(100,10)),
+        `Design Confidence` = as.numeric(rep(100,20)),
         check.names = FALSE)
     values[["DF"]] <- null_df
     
@@ -166,7 +166,8 @@ shinyServer(function(input, output) {
         output$input <- renderPrint(isolate({
             med <- input$prior_median
             cat("Transform:", input$transform,"\n")
-            cat("Prior: "," : mu = ", med, " : q75 = ", input$prior_q75,"\n")
+            cat("Multi:", input$multi, "\n")
+            cat("Prior: "," : mu = ", med, " : q75 = ", input$prior_q75, "\n")
             cat("Prior Bounds: lower = ", input$prior_lower, " : upper = ", input$prior_upper,"\n")
             cat("Data:\n")
             df <- hot_to_r(input$hot)

@@ -55,7 +55,7 @@ shinyUI(fluidPage(
                 sidebarPanel(
                     numericInput(
                         "multi",
-                        "Multiplier",
+                        "Tau Multiplier",
                         .01
                     ),
                     actionButton("run","Run")
@@ -63,6 +63,7 @@ shinyUI(fluidPage(
                 mainPanel(
                     #p("% Variance Due to Unaccounted for Non-Sampling Error:"),
                     textOutput("pooling"),
+                    br(),
                     p("Consensus Estimate:"),
                     tableOutput("post_summaries"),
                     p("Posterior:"),
