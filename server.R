@@ -176,6 +176,24 @@ shinyServer(function(input, output) {
             
         }))
         
+        output$forest <- renderPlot({
+            prior <- isolate(prior_samp())
+            forest_df <- data.frame(Name=c('Prior',paste(rep('Estimate',nrow(df)),1:nrow(df)),'Consensus'),
+                                    Estimate = c(median(prior),df[,1],median(theta)),
+                                    Lower = c(quantile(prior,c(0.025,0.975))[['2.5%']],df[,2],quantile(theta,c(0.025,0.975))[['2.5%']]),
+                                    Upper= c(quantile(prior,c(0.025,0.975))[['97.5%']],df[,3],quantile(theta,c(0.025,0.975))[['97.5%']]),
+                                    Type=c('Prior',rep('Estimate',nrow(df)),'Consensus'),
+                                    Lower_scaled = c(NA,df[,1]-(df[,3]-df[,2])/(2*(conf)),NA),
+                                    Upper_scaled = c(NA,df[,1]+(df[,3]+df[,2])/(2*conf),NA))
+            
+            p <- ggplot(data=forest_df,aes(x=Estimate,y=Name,color=Type)) +
+                geom_pointrange(aes(xmin=Lower,xmax=Upper),shape=15,size=1) + 
+                geom_linerange(aes(xmin=Lower_scaled,xmax=Upper_scaled),linetype='dotted',size=1) +
+                labs(x='Population',y='',size=12) +
+                theme(legend.position="none",text = element_text(size = 12))
+            suppressWarnings(print(p))
+        })
+        
         removeNotification(id)
     })
 

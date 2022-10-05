@@ -28,6 +28,7 @@ combine_estimates_stan <- function(yhat, sigma, conf, prior_mu, prior_tau, low=-
 # the nuisance parameters nu_i eliminated (hence, no nu)
 # It requires y_i and sigma_i, as well as the posterior samples for theta and tau.
 # Note that it returns R^2 and lambda for just Level 1 of the full model
+# Updated as of 10/4/22
 
 rsq_lambda <- function(y,sigma,theta,tau){
   #y and sigma are N-dimensional vectors
@@ -41,14 +42,13 @@ rsq_lambda <- function(y,sigma,theta,tau){
   theta_mat <- matrix(rep(theta,N),ncol=N,byrow=FALSE)
   #
   w_mat <- sigma_sq_mat/(tau_sq_mat + sigma_sq_mat)
-  
-  #
-  E_V_1 <- apply(w_mat*(y_mat-theta_mat),1,var)
-  E_V_2 <- (1/N)*rowSums((1-w_mat)*sigma_sq_mat)
-  E_V <- mean(E_V_1+E_V_2)
   ##
-  V_E_1 <- colMeans(w_mat*(y_mat-theta_mat))
-  V_E <- var(V_E_1)
+  V_E <- var(colMeans(w_mat*(y_mat-theta_mat)))
+  #
+  E_V_2 <- mean(apply(w_mat*(y_mat-theta_mat),2,var))
+  E_V_3 <- mean(colMeans((1-w_mat)*sigma_sq_mat))
+  E_V <- V_E+E_V_2+E_V_3
+  
   ##
   lambda <- 1-V_E/E_V
   Rsq <- 1-E_V/var(y)

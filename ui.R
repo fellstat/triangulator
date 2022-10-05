@@ -75,6 +75,10 @@ shinyUI(fluidPage(
                     verbatimTextOutput("input")
                 )
             )
+        ),
+        tabPanel(
+            "Forest Plot",
+            plotOutput("forest")
         )
     )
 ))
