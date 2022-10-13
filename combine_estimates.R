@@ -10,7 +10,7 @@ combine_estimates_stan <- function(yhat, sigma, conf, prior_mu, prior_tau, low=-
                prior_tau = prior_tau,
                low=low,
                up=up,
-               var_yhat = as.numeric(var(yhat)),
+               var_yhat = as.numeric(var(yhat)) + .000001, # avoid crash if all estimates equal
                multi=multi)
   if(is.null(.globals$model)){
     model <- stan_model(file = "combine_estimates.stan")

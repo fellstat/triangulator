@@ -2,6 +2,8 @@ library(rhandsontable)
 library(ggplot2)
 library(shiny)
 library(rstan)
+library(shinyhelper)
+library(patchwork)
 
 source("combine_estimates.R")
 
@@ -10,15 +12,26 @@ valid_numeric <- function(x) !is.null(x) && is.finite(x)
 
 shinyServer(function(input, output) {
     
+    observe_helpers() #help files
+    
     values <- reactiveValues()
-    null_df <- data.frame(
-        Estimate = as.numeric(rep(NA,20)), 
-        `Lower` = as.numeric(rep(NA,20)), 
-        `Upper` = as.numeric(rep(NA,20)), 
-        #`Standard Error` = as.numeric(rep(NA,10)), 
-        `Design Confidence` = as.numeric(rep(100,20)),
-        check.names = FALSE)
-    values[["DF"]] <- null_df
+    empty_input_table <- function(nr){
+        data.frame(
+            Name = paste0("Source ",1:nr), 
+            Estimate = as.numeric(rep(NA,nr)), 
+            `Lower` = as.numeric(rep(NA,nr)), 
+            `Upper` = as.numeric(rep(NA,nr)), 
+            `Design Confidence` = as.numeric(rep(100,nr)),
+            check.names = FALSE)
+    }
+    input_table_rows <- 5
+    values[["DF"]] <- empty_input_table(input_table_rows)
+    
+    observeEvent(input$more,{
+        print("more")
+        input_table_rows <<- input_table_rows + 5
+        values[["DF"]] <- empty_input_table(input_table_rows)
+    })
     
     get_transform <- function(){
         if(input$transform == "None")
@@ -108,10 +121,10 @@ shinyServer(function(input, output) {
         prior_q75 <- transform(input$prior_q75)
         prior_sd <- (prior_q75 -prior_med) / .674
         df <- hot_to_r(input$hot)
-        df <- df[!is.na(df[[1]]),]
-        yhat <- transform(df[,1])
-        yhat_sd <- (transform(df[,3]) - transform(df[,2])) / (2 * 1.96)
-        conf <- df[,4] / 100
+        df <- df[!is.na(df$Estimate),]
+        yhat <- transform(df$Estimate)
+        yhat_sd <- (transform(df$Upper) - transform(df$Lower)) / (2 * 1.96)
+        conf <- df$`Design Confidence` / 100
         low <- -Inf
         high <- Inf
         if(valid_numeric(input$prior_lower))
@@ -135,19 +148,45 @@ shinyServer(function(input, output) {
         
         output$pooling <- renderText({
             paste0(
-                "% Variance Due to Unaccounted for Non-Sampling Error: ",
+                "Pooling Factor (%): ",
                 round(100*lambda),
                 "%"
                 )
         })
         
         output$post_plot <- renderPlot({
-            df <- rbind(data.frame(`Population Value`=theta, Distribution="Posterior"), data.frame(`Population Value`=isolate(prior_samp()), Distribution="Prior"))
-            qplot(x= Population.Value, color=Distribution, data=df, geom="density",trim=TRUE) + 
+            df2 <- rbind(
+                data.frame(`Population Value`=theta, Distribution="Posterior"), 
+                data.frame(`Population Value`=isolate(prior_samp()), Distribution="Prior")
+            )
+            p1 <- qplot(x= Population.Value, color=Distribution, data=df2, geom="density",trim=TRUE) + 
                 ylab("Density") + 
                 scale_y_continuous(breaks=c()) + 
-                theme_bw()
-        })
+                theme_bw() +
+                theme(legend.position = "bottom")
+            prior <- isolate(prior_samp())
+            conf <- df$`Design Confidence`/100
+            lsc <- transform(df$Estimate) - (transform(df$Estimate) - transform(df$Lower)) / conf
+            usc <- transform(df$Estimate) + (transform(df$Upper) - transform(df$Estimate)) / conf
+            
+            forest_df <- data.frame(Name=factor(c('Prior',df$Name,'Consensus'),levels=rev(c('Prior',df$Name,'Consensus'))),
+                                    Estimate = c(median(prior),df$Estimate,median(theta)),
+                                    Lower = c(quantile(prior,c(0.025,0.975))[['2.5%']],df$Lower,quantile(theta,c(0.025,0.975))[['2.5%']]),
+                                    Upper= c(quantile(prior,c(0.025,0.975))[['97.5%']],df$Upper,quantile(theta,c(0.025,0.975))[['97.5%']]),
+                                    Type=c('#00BFC4',rep("#000000",nrow(df)),'#F8766D'),
+                                    Lower_scaled = c(NA, inv_transform(lsc), NA),
+                                    Upper_scaled = c(NA, inv_transform(usc), NA))
+            p <- ggplot(data=forest_df,aes(x=Estimate,y=Name,color=Type)) +
+                geom_pointrange(aes(xmin=Lower,xmax=Upper),shape=15,size=1) + 
+                geom_linerange(aes(xmin=Lower_scaled,xmax=Upper_scaled),linetype='dotted',size=1) +
+                scale_color_identity() +
+                labs(x='Population',y='',size=12) +
+                theme_bw() +
+                theme(legend.position="none",text = element_text(size = 12))
+            (p / p1) + plot_layout(heights = c(2,1))
+        },
+          height = 450
+        )
         output$post_quant <- renderTable({
             q <- t(as.matrix(quantile(theta, probs = c(.05,.1,.2,.3,.4,.5,.6,.7,.8,.9,.95))))
             
@@ -171,28 +210,10 @@ shinyServer(function(input, output) {
             cat("Prior Bounds: lower = ", input$prior_lower, " : upper = ", input$prior_upper,"\n")
             cat("Data:\n")
             df <- hot_to_r(input$hot)
-            df <- df[!is.na(df[[1]]),]
+            df <- df[!is.na(df$Estimate),]
             print(df)
             
         }))
-        
-        output$forest <- renderPlot({
-            prior <- isolate(prior_samp())
-            forest_df <- data.frame(Name=c('Prior',paste(rep('Estimate',nrow(df)),1:nrow(df)),'Consensus'),
-                                    Estimate = c(median(prior),df[,1],median(theta)),
-                                    Lower = c(quantile(prior,c(0.025,0.975))[['2.5%']],df[,2],quantile(theta,c(0.025,0.975))[['2.5%']]),
-                                    Upper= c(quantile(prior,c(0.025,0.975))[['97.5%']],df[,3],quantile(theta,c(0.025,0.975))[['97.5%']]),
-                                    Type=c('Prior',rep('Estimate',nrow(df)),'Consensus'),
-                                    Lower_scaled = c(NA,df[,1]-(df[,3]-df[,2])/(2*(conf)),NA),
-                                    Upper_scaled = c(NA,df[,1]+(df[,3]+df[,2])/(2*conf),NA))
-            
-            p <- ggplot(data=forest_df,aes(x=Estimate,y=Name,color=Type)) +
-                geom_pointrange(aes(xmin=Lower,xmax=Upper),shape=15,size=1) + 
-                geom_linerange(aes(xmin=Lower_scaled,xmax=Upper_scaled),linetype='dotted',size=1) +
-                labs(x='Population',y='',size=12) +
-                theme(legend.position="none",text = element_text(size = 12))
-            suppressWarnings(print(p))
-        })
         
         removeNotification(id)
     })
