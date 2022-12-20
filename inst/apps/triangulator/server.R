@@ -140,11 +140,12 @@ shinyServer(function(input, output) {
             prior_sd,
             low,
             high,
-            multi)
-
+            multi,
+            iter=10000,
+            thin=5)
+        browser()
         theta <- post$theta
         theta <- inv_transform(theta)
-        browser()
         Rsq <- rsq_lambda(yhat,yhat_sd/conf, post$theta, post$tau)$Rsq
 
         output$pooling <- renderText({
