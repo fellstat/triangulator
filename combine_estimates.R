@@ -57,3 +57,4 @@ rsq_lambda <- function(y,sigma,theta,tau){
   names(return_list) <- c("lambda","Rsq")
   return(return_list)
 }
+

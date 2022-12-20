@@ -10,7 +10,7 @@ srhelp <- function(x, ...){
 shinyUI(fluidPage(
     
     # Application title
-    titlePanel("Consensus Estimate Calculator"),
+    titlePanel("The Triangulator - A Consensus Estimate Calculator"),
     
     tabsetPanel(
         tabPanel(
@@ -24,7 +24,7 @@ shinyUI(fluidPage(
             ) %>% srhelp(content="transform"),
             rHandsontableOutput("hot"),
             actionButton("more","More rows"),
-            p("Transformation: The transformation to apply to the estimates. Log is recommended for population size, Logit for proportions and None for other values."),
+            #p("Transformation: The transformation to apply to the estimates. Log is recommended for population size, Logit for proportions and None for other values."),
             p("Estimate : An estimate from a study"),
             p("Lower: 95% confindence interval lower bound"),
             p("Upper: 95% confindence interval upper bound"),

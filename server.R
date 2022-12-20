@@ -33,6 +33,30 @@ shinyServer(function(input, output) {
         values[["DF"]] <- empty_input_table(input_table_rows)
     })
     
+    plot_scale_transform <- function(){
+        if(input$transform == "None")
+            tf <- 'identity'
+        else if(input$transform == "Log")
+            tf <- 'log'
+        else 
+            tf <-  'logit'
+        tf
+    }
+    
+    ### An auxiliary function to make 'pretty' breaks for the plot
+    plot_scale_breaks <-function(plot_min_val,plot_max_val){
+        if(input$transform=='Log'){
+            ugly_breaks = exp(pretty(c(log(plot_min_val),log(plot_max_val))))
+            breaks = c()
+            for (i in 1:length(ugly_breaks)){
+                breaks <- c(breaks,pretty(ugly_breaks[i])[1])
+            }
+        } else {
+            breaks <- pretty(c(min_val,max_val))
+        }
+        return(breaks)
+    }
+    
     get_transform <- function(){
         if(input$transform == "None")
             tf <- function(x) x
@@ -144,12 +168,12 @@ shinyServer(function(input, output) {
         
         theta <- post$theta
         theta <- inv_transform(theta)
-        lambda <- rsq_lambda(yhat,yhat_sd, post$theta, post$tau)$lambda
+        Rsq <- rsq_lambda(yhat,yhat_sd/conf, post$theta, post$tau)$Rsq
         
         output$pooling <- renderText({
             paste0(
-                "Pooling Factor (%): ",
-                round(100*lambda),
+                "Percent of Estimate Variability Attributable to Unaccounted-for Study Bias: ",
+                round(100*Rsq),
                 "%"
                 )
         })
@@ -180,6 +204,8 @@ shinyServer(function(input, output) {
                 geom_pointrange(aes(xmin=Lower,xmax=Upper),shape=15,size=1) + 
                 geom_linerange(aes(xmin=Lower_scaled,xmax=Upper_scaled),linetype='dotted',size=1) +
                 scale_color_identity() +
+                #scale_x_continuous(trans=scales::trans_new(input$transform,transform=get_transform(),inverse=get_inv_transform()))+
+                scale_x_continuous(trans=plot_scale_transform(),breaks=plot_scale_breaks(min(inv_transform(lsc)),max(inv_transform(usc))))+
                 labs(x='Population',y='',size=12) +
                 theme_bw() +
                 theme(legend.position="none",text = element_text(size = 12))
