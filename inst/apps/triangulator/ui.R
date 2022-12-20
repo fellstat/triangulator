@@ -8,10 +8,10 @@ srhelp <- function(x, ...){
 }
 
 shinyUI(fluidPage(
-    
+
     # Application title
     titlePanel("The Triangulator - A Consensus Estimate Calculator"),
-    
+
     tabsetPanel(
         tabPanel(
             "Enter Estimates",
@@ -74,6 +74,9 @@ shinyUI(fluidPage(
                     tableOutput("post_summaries"),
                     p("Posterior:"),
                     plotOutput("post_plot"),
+                    br(),
+                    br(),
+                    br(),
                     p("Posterior Quantiles:"),
                     tableOutput("post_quant"),
                     hr(),

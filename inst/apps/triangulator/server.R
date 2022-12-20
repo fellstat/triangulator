@@ -143,7 +143,6 @@ shinyServer(function(input, output) {
             multi,
             iter=10000,
             thin=5)
-        browser()
         theta <- post$theta
         theta <- inv_transform(theta)
         Rsq <- rsq_lambda(yhat,yhat_sd/conf, post$theta, post$tau)$Rsq
@@ -151,7 +150,7 @@ shinyServer(function(input, output) {
         output$pooling <- renderText({
             paste0(
                 "Percent of Estimate Variability Attributable to Unaccounted-for Study Bias: ",
-                round(100*Rsq),
+                round(max(100*Rsq,0)),
                 "%"
                 )
         })
@@ -178,12 +177,13 @@ shinyServer(function(input, output) {
                                     Lower_scaled = c(NA, inv_transform(lsc), NA),
                                     Upper_scaled = c(NA, inv_transform(usc), NA))
             p <- ggplot(data=forest_df,aes(x=Estimate,y=Name,color=Type)) +
-                geom_pointrange(aes(xmin=Lower,xmax=Upper),shape=15,size=1) +
-                geom_linerange(aes(xmin=Lower_scaled,xmax=Upper_scaled),linetype='dotted',linewidth=1) +
-                scale_color_identity() +
-                labs(x='Population',y='',size=12) +
-                theme_bw() +
-                theme(legend.position="none",text = element_text(size = 12))
+              geom_pointrange(aes(xmin=Lower,xmax=Upper),shape=15,size=1) +
+              geom_linerange(aes(xmin=Lower_scaled,xmax=Upper_scaled,linetype='dotted'),linewidth=1) +
+              scale_color_identity() +
+              scale_linetype_identity(labels="CI Extended by Study Confidence", guide=guide_legend(title="")) +
+              labs(x='Population',y='',size=12) +
+              theme_bw() +
+              theme(legend.position="bottom", text = element_text(size = 12))
 
             if(input$transform == "Log"){
               p1 <- p1 + scale_x_log10(labels = scales::label_comma())
