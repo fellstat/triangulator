@@ -13,6 +13,8 @@ and the steps of the consensus process proceed as follows:
 5. Enter the above information into the Shiny application and run the analysis to get a consensus estimate.
 6. Report the consensus estimate and its credible interval. Additionally, report information in the "Data and Input Parameters" field so that the estimate is reproducible and the stakeholder decisions are fully inspectable.
 
+Check out the manual at https://fellstat.github.io/triangulator/
+
 ## Installation
 
 You can install the development version of triangulator from [GitHub](https://github.com/) with:
