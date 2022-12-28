@@ -1,12 +1,11 @@
 Package: triangulator
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Derive Consensus Estimates of a Population Quantity from Multiple Empirical Estimates Using a Hierarchical Bayesian Model
+Version: 0.1
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    c(person("Ian", "Fellows", , "ian@fellstat.com", role = c("aut", "cre")),
+    person("Carl", "Corcoran", , "ruu2@cdc.gov", role = c("aut")))
+Description: The Triangulator is a Shiny user interface designed to help derive consensus estimates of a population quantity (e.g. a population size, a proportion, a mean, etc.) from multiple empirical estimates.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
@@ -15,6 +14,11 @@ Depends:
     R (>= 3.4.0)
 Imports: 
     methods,
+    rhandsontable,
+    ggplot2,
+    shiny,
+    shinyhelper,
+    patchwork,
     Rcpp (>= 0.12.0),
     RcppParallel (>= 5.0.1),
     rstan (>= 2.18.1),
