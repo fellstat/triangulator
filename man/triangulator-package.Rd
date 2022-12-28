@@ -4,10 +4,7 @@
 \name{triangulator-package}
 \alias{triangulator-package}
 \alias{triangulator}
-\title{The 'triangulator' package.}
+\title{Derive a consensus estimate from multiple, possibly contradictory, empirical estimates.}
 \description{
-A DESCRIPTION OF THE PACKAGE
-}
-\references{
-Stan Development Team (2022). RStan: the R interface to Stan. R package version 2.21.7. https://mc-stan.org
+The Triangulator is a Shiny user interface designed to help derive consensus estimates of a population quantity (e.g. a population size, a proportion, a mean, etc.) from multiple empirical estimates.
 }
