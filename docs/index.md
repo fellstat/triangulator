@@ -99,7 +99,7 @@ For a proportion with the point estimate ($\hat{p}$) reported and the sample siz
 
 $$\hat{p} \pm 1.96 \sqrt{\hat{p}(1-\hat{p})/n}.$$
 
-For complex sampling designs, the [effective sample size](https://en.wikipedia.org/wiki/Design_effect) is often lower than the collected sample size. In these cases, $n$ should be adjusted by dividing by the study design effect. Design effects of 2 are often used for RDS studies and 1.5 for Time location sampling. For example, if an RDS study with 300 individuals has a design effect of 2, $n$ in the confidence interval calculation should be 150. If a time location sample with 200 individuals has a design effect of 1.5, then $n$ should be 133.
+For complex sampling designs, the [effective sample size](https://en.wikipedia.org/wiki/Design_effect) is often lower than the collected sample size. In these cases, $n$ should be adjusted by dividing by the study design effect. Design effects of 2 are often used for RDS studies and 1.5 for time location sampling. For example, if an RDS study with 300 individuals has a design effect of 2, $n$ in the confidence interval calculation should be 150. If a time location sample with 200 individuals has a design effect of 1.5, then $n$ should be 133.
 
 For proportions calculated in a sub-population, $n$ should be multiplied by the proportion of individuals in the sub-population. For example, consider an estimate of the proportion of HIV positive individuals who are on ART (ART coverage) with the total sample size of 230. If the proportion of individuals who are HIV positive is 30%, then the $n$ that should be used would be $.3*230=69$. This number should be further divided by the study's design effect.
 
@@ -128,7 +128,7 @@ Begin with the elicitation of the median. Pose the question
 **What is your best guess for what the quantity is?** 
 </p>
 
-to each expert. Remind them to ignore the estimates that are going to be used. Record record each value and then open a discussion two synthesize these into a single value for the whole group.
+to each expert. Remind them to ignore the estimates that are going to be used. Record each value and then open a discussion two synthesize these into a single value for the whole group.
 
 Next elicit the 75% percentile. Pose the question 
 
@@ -146,11 +146,11 @@ Select the appropriate estimate type in the "Enter Estimates" tab of The Triangu
 
 ----------
 
-The above screenshot shows a population size estimate prior with median 300 and 75% percentile 4000. The histogram represents the distribution. Ask each expert whether this is a reasonable representation of the uncertainty about the population quantity. If it does not, change the median and 75% percentile to refine the distribution.
+The above screenshot shows a population size estimate prior with median 3000 and 75% percentile 4000. The histogram represents the distribution. Ask each expert whether this is a reasonable representation of the uncertainty about the population quantity. If it does not, change the median and 75% percentile to refine the distribution.
 
 The summary tables can also be useful in evaluating the reasonableness of the prior. Is it reasonable to think that there is a 20% chance the true value is above the 80th quantile? Is it reasonable to think that there is a 10% chance it is below the 10th?
 
-Finally, lower and upper bounds can be added. For example, there may service lists and we know that the population size is larger than the number of individuals on the list. Thus, that number would be a lower bound. Similarly, the number of key population members in a city is lower than the number of people in the city, thus that may form an upper bound. The upper and lower bound should be values beyond which the population quantity is very implausible.
+Finally, lower and upper bounds can be added. For example, there may service lists and we know that the population size is larger than the number of individuals on the list. Thus, that number would be a lower bound. Similarly, the number of key population members in a city is lower than the number of people in the city, thus that may form an upper bound. The upper and lower bounds should be values beyond which the population quantity is very implausible.
 
 
 ## 4. Study Evaluation
