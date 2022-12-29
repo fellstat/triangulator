@@ -6,8 +6,8 @@
       }
     });
   </script>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-  
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+    
 # Triangulator
 
 The Triangulator is a Shiny user interface designed to help derive consensus estimates of a population quantity (e.g. a population size, a proportion, a mean, etc.) from multiple empirical estimates. Underlying the application is a Bayesian multi-level model, and the steps of the consensus process proceed as follows:
@@ -88,17 +88,16 @@ Intervals are required for the triangulation process. Without a measure of the u
 #### Population Size
 
 For two source capture recapture type estimates, which include service and event multipliers, the study will typically report the number of individuals in the first and second samples ($n_1$ and $n_2$). For service and event multipliers the first sample count is the service or event count. To construct an interval the number of people present in both the first and second samples is required. This may be reported, but if it is not the population size estimate ($\hat{N}$) can be used to recover it using the formula
-$$
-n_{12} = \frac{n_1 n_2}{\hat{N}}.
-$$
+
+$$n_{12} = \frac{n_1 n_2}{\hat{N}}.$$
+
 A CRC [confidence interval calculator](https://www.quantitativeskills.com/sisa/statistics/crc.php) may then be used to construct the interval.
 
 #### Proportions (e.g. Prevalence, ART Coverage)
 
 For a proportion with the point estimate ($\hat{p}$) reported and the sample size reported ($n$), the Wald 95% confidence interval is
-$$
-\hat{p} \pm 1.96 \sqrt{\hat{p}(1-\hat{p})/n}.
-$$
+
+$$\hat{p} \pm 1.96 \sqrt{\hat{p}(1-\hat{p})/n}.$$
 
 For complex sampling designs, the [effective sample size](https://en.wikipedia.org/wiki/Design_effect) is often lower than the collected sample size. In these cases, $n$ should be adjusted by dividing by the study design effect. Design effects of 2 are often used for RDS studies and 1.5 for Time location sampling. For example, if an RDS study with 300 individuals has a design effect of 2, $n$ in the confidence interval calculation should be 150. If a time location sample with 200 individuals has a design effect of 1.5, then $n$ should be 133.
 
@@ -107,14 +106,13 @@ For proportions calculated in a sub-population, $n$ should be multiplied by the 
 #### Means
 
 If the standard error ($\hat{\sigma}_{se}$) of the mean estimate ($\hat{m}) is reported, then the interval may be constructed as
-$$
-\hat{m} \pm 1.96 \hat{\sigma}_{se}.
-$$
+
+$$\hat{m} \pm 1.96 \hat{\sigma}_{se}.$$
 
 If only the standard deviation ($\hat{\sigma}$) is reported then the interval is
-$$
-\hat{m} \pm 1.96 \frac{\hat{\sigma}}{\sqrt{n}},
-$$
+
+$$\hat{m} \pm 1.96 \frac{\hat{\sigma}}{\sqrt{n}},$$
+
 where $n$ should be calculated similarly to the proportion example.
 
 
