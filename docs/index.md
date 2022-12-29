@@ -105,7 +105,7 @@ For proportions calculated in a sub-population, $n$ should be multiplied by the 
 
 #### Means
 
-If the standard error ($\hat{\sigma}_{se}$) of the mean estimate ($\hat{m}) is reported, then the interval may be constructed as
+If the standard error ($\hat{\sigma}_{se}$) of the mean estimate ($\hat{m}$) is reported, then the interval may be constructed as
 
 $$\hat{m} \pm 1.96 \hat{\sigma}_{se}.$$
 
