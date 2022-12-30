@@ -27,7 +27,7 @@ $$ \eta_i \sim N(\theta, \tau).$$
 
 The prior for the population quantity is truncated normal
 
-$$\theta \sim(\mu_0, \sigma_0, \textrm{lower}, \textrm{upper}).$$
+$$\theta \sim N(\mu_0, \sigma_0, \textrm{lower}, \textrm{upper}).$$
 
 The prior for $\tau$ is half-cauchy in order to put most of the probability mass near 0 (i.e. no study bias not accounted for by the design confidences) with heavy tails, which allows for large amounts of bias if the data calls for it.
 
