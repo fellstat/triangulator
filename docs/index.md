@@ -19,7 +19,7 @@ The Triangulator is a Shiny user interface designed to help derive consensus est
 5. Enter the above information into the Shiny application and run the analysis to get a consensus estimate.
 6. Report the consensus estimate and its credible interval. Additionally, report information in the "Data and Input Parameters" field so that the estimate is reproducible and the stakeholder decisions are fully inspectable.
 
-This document will guide you through the above steps.
+This document will guide you through the above steps. The mathematical details can be found [here](math.html)
 
 ## 0. Launch the Triangulator Application
 
