@@ -34,3 +34,5 @@ The prior for $\tau$ is half-cauchy in order to put most of the probability mass
 $$ \tau \sim \textrm{half_cauchy}( \alpha ).$$
 
 $\alpha$ is chosen so that it is much smaller than the sample variability of the $y$s. By default we choose $\alpha=0.01s(y)$, where $s(y)$ is the observed sample standard deviation of the $y_i$s. The $0.01$ is dubbed the $\tau$ multiplier.
+
+The posterior for $\theta$ has no closed form solution, but is easily sampled from using [Stan](https://mc-stan.org/). This results in $k$ sampled values from the posterior $\theta^{(1)},...,\theta^{(k)}$, which are then transformed back into the original scale of the population quantity $g^{-1}(\theta^{(1)}),...,g^{-1}(\theta^{(k)})$ and displayed to the user.
