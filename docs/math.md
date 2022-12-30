@@ -12,7 +12,7 @@
 # Mathematical Details
 
 Suppose that we have $n$ estimates of a quantity of interest along with confidence (or credible) intervals for each. We begin by (optionally) applying a transformation $g$ to the estimates with inverse $g^{-1}$. This transformation is designed so that the sampling distribution for transformed estimates to be closer to normal than
-raw estimates. Population Size estimates are log transformed. Proportion estimates
+raw estimates. Population size estimates are log transformed. Proportion estimates
 are logit transformed. Other estimates use the identity transformation.
 
 If the ith raw estimate is $y'_i$ with lower and upper 95% interval ($l'_i$,$u'_i$), the transformed data is then $y_i=g(y'_i)$, $l_i=g(l'_i)$, and $u_i=g(u'_i)$. If the estimate follows the central limit theorem then the standard error is $\sigma_i=\frac{u_i-l_i}{2*1.96}$.
