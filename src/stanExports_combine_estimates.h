@@ -202,7 +202,7 @@ public:
         double tau(0);
         tau = vals_r__[pos__++];
         try {
-            writer__.scalar_lub_unconstrain(0, up, tau);
+            writer__.scalar_lb_unconstrain(0, tau);
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(std::runtime_error(std::string("Error transforming variable tau: ") + e.what()), current_statement_begin__, prog_reader__());
         }
@@ -242,9 +242,9 @@ public:
             local_scalar_t__ tau;
             (void) tau;  // dummy to suppress unused var warning
             if (jacobian__)
-                tau = in__.scalar_lub_constrain(0, up, lp__);
+                tau = in__.scalar_lb_constrain(0, lp__);
             else
-                tau = in__.scalar_lub_constrain(0, up);
+                tau = in__.scalar_lb_constrain(0);
             // model body
             current_statement_begin__ = 21;
             lp_accum__.add(normal_log<propto__>(yhat, theta, stan::math::sqrt(add((tau * tau), elt_multiply(elt_divide(sigma, conf), elt_divide(sigma, conf))))));
@@ -299,7 +299,7 @@ public:
         // read-transform, write parameters
         double theta = in__.scalar_lub_constrain(low, up);
         vars__.push_back(theta);
-        double tau = in__.scalar_lub_constrain(0, up);
+        double tau = in__.scalar_lb_constrain(0);
         vars__.push_back(tau);
         double lp__ = 0.0;
         (void) lp__;  // dummy to suppress unused var warning

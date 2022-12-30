@@ -14,7 +14,7 @@ data {
 
 parameters {
   real<lower=low, upper=up> theta;
-  real<lower=0,upper=up> tau;
+  real<lower=0> tau;
 }
 
 model {
