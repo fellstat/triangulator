@@ -19,7 +19,7 @@ If the ith raw estimate is $y'_i$ with lower and upper 95% interval ($l'_i$,$u'_
 
 We construct a Bayesian hierarchical model using the transformed data where the data distribution is
 
-$$y_i \sim N(\eta_i,\frac{sigma_i}{c_i}),$$
+$$y_i \sim N(\eta_i,\frac{\sigma_i}{c_i}),$$
 
 where $\eta_i$ is the expected value of the estimate and $c_i$ is the design confidence. The true population value is denoted by $\theta$, so the bias of the ith study is $\eta_i - \theta$. we model the biases as
 
