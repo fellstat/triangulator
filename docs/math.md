@@ -25,7 +25,7 @@ where $\eta_i$ is the expected value of the estimate and $c_i$ is the design con
 
 $$ \eta_i \sim N(\theta, \tau).$$
 
-The prior for the population quantity is truncated normal
+The prior for the transformed population quantity is truncated normal
 
 $$\theta \sim N(\mu_0, \sigma_0, \textrm{lower}, \textrm{upper}).$$
 
