@@ -1,3 +1,14 @@
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+
+
 # Mathematical Details
 
 Suppose that we have $n$ estimates of a quantity of interest along with confidence (or credible) intervals for each. We begin by (optionally) applying a transformation $g$ to the estimates with inverse $g^{-1}$. This transformation is designed so that the sampling distribution for transformed estimates to be closer to normal than
