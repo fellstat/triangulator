@@ -91,7 +91,7 @@ For two source capture recapture type estimates, which include service and event
 
 $$n_{12} = \frac{n_1 n_2}{\hat{N}}.$$
 
-A CRC [confidence interval calculator](https://www.quantitativeskills.com/sisa/statistics/crc.php) may then be used to construct the interval.
+A CRC [confidence interval calculator](https://www.quantitativeskills.com/sisa/statistics/crc.htm) may then be used to construct the interval.
 
 #### Proportions (e.g. Prevalence, ART Coverage)
 
