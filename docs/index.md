@@ -103,6 +103,14 @@ For complex sampling designs, the [effective sample size](https://en.wikipedia.o
 
 For proportions calculated in a sub-population, $n$ should be multiplied by the proportion of individuals in the sub-population. For example, consider an estimate of the proportion of HIV positive individuals who are on ART (ART coverage) with the total sample size of 230. If the proportion of individuals who are HIV positive is 30%, then the $n$ that should be used would be $.3*230=69$. This number should be further divided by the study's design effect.
 
+Wald intervals are not always ideal as they require larger sample sizes to meet their assumptions and can have intervals that are less than 0 or greater than 1. Wilson, or exact Clopper-Pearson intervals are preferred. To calculate these, first calculate as psuedo-count for the number of positive cases given $n$
+
+$$n_+ = \hat{p}n.$$
+
+Then use a [calculator](https://epitools.ausvet.com.au/ciproportion) to construct the intervals, rounding $n_+$ to the nearest integer.
+
+To see a worked example click [here](prop.html).
+
 #### Means
 
 If the standard error ($\hat{\sigma}_{se}$) of the mean estimate ($\hat{m}$) is reported, then the interval may be constructed as
