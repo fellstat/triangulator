@@ -93,6 +93,8 @@ $$n_{12} = \frac{n_1 n_2}{\hat{N}}.$$
 
 A CRC [confidence interval calculator](https://www.quantitativeskills.com/sisa/statistics/crc.htm) may then be used to construct the interval.
 
+To see a worked example click [here](prop.html).
+
 #### Proportions (e.g. Prevalence, ART Coverage)
 
 For a proportion with the point estimate ($\hat{p}$) reported and the sample size reported ($n$), the Wald 95% confidence interval is
