@@ -1,6 +1,5 @@
 library(rhandsontable)
 library(shiny)
-library(shinycssloaders)
 library(shinyhelper)
 
 srhelp <- function(x, ...){
