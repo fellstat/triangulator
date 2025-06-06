@@ -10,6 +10,7 @@ data {
   real up;
   real var_yhat;
   real multi;
+  int flat_prior;
 }
 
 parameters {
@@ -20,5 +21,6 @@ parameters {
 model {
   yhat ~ normal(theta,sqrt(tau .* tau + (sigma ./ conf).*(sigma ./ conf)));
   tau ~ cauchy(0,multi*sqrt(var_yhat));
-  theta ~ normal(prior_mu, prior_tau);
+  if(flat_prior != 1)
+    theta ~ normal(prior_mu, prior_tau);
 }

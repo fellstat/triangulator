@@ -13,6 +13,7 @@ combine_estimates_stan(
   low = -Inf,
   up = Inf,
   multi = 0.01,
+  flat_prior = FALSE,
   ...
 )
 }
@@ -32,6 +33,8 @@ combine_estimates_stan(
 \item{up}{upper bound}
 
 \item{multi}{tau multiplier}
+
+\item{flat_prior}{should a flat prior be used}
 
 \item{...}{Additional parameters passed to rstan::sampling}
 }

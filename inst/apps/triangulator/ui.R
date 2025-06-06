@@ -40,10 +40,14 @@ shinyUI(fluidPage(
                     #    c("Normal","Log-Normal"),
                     #    selected="Log-Normal"
                     #),
-                    numericInput("prior_median","Median",NA) %>% srhelp(content="prior"),
-                    numericInput("prior_q75","75th Percentile", NA) %>% srhelp(content="prior"),
-                    numericInput("prior_lower","Lower Bound",-Inf) %>% srhelp(content="prior"),
-                    numericInput("prior_upper","Upper Bound",Inf) %>% srhelp(content="prior")
+                    radioButtons("prior_type","Prior Type", c("Uninformative"="Uniform","Informative"="Informative"), "Uniform")%>% srhelp(content="prior"),
+                    conditionalPanel(
+                      "input.prior_type == 'Informative'",
+                      numericInput("prior_median","Median",NA) %>% srhelp(content="prior"),
+                      numericInput("prior_q75","75th Percentile", NA) %>% srhelp(content="prior"),
+                    ),
+                    numericInput("prior_lower","Lower Bound (Optional)",-Inf) %>% srhelp(content="prior"),
+                    numericInput("prior_upper","Upper Bound (Optional)",Inf) %>% srhelp(content="prior")
                 ),
                 mainPanel(
                     plotOutput("prior"),

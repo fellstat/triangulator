@@ -9,23 +9,27 @@
 #' @param low Lower bound
 #' @param up upper bound
 #' @param multi tau multiplier
+#' @param flat_prior should a flat prior be used
 #' @param ... Additional parameters passed to rstan::sampling
 #' @examples
 #' y <- c(1,2,3)
 #' se <- c(2,2,2)
 #' conf <- c(1,1,.5)
 #' combine_estimates_stan(y, se, conf, 1, 5)
-combine_estimates_stan <- function(yhat, sigma, conf, prior_mu, prior_tau, low=-Inf, up=Inf, multi = .01, ...){
+combine_estimates_stan <- function(yhat, sigma, conf, prior_mu, prior_tau, low=-Inf, up=Inf, multi = .01, flat_prior = FALSE, ...){
   stan_data <- list(N = length(yhat),
-               yhat = yhat,
-               sigma = sigma,
-               conf=conf,
+               yhat = as.array(yhat),
+               sigma = as.array(sigma),
+               conf=as.array(conf),
                prior_mu = prior_mu,
                prior_tau = prior_tau,
                low=low,
                up=up,
                var_yhat = as.numeric(var(yhat)) + .000001, # avoid crash if all estimates equal
-               multi=multi)
+               multi=multi,
+               flat_prior = flat_prior)
+  if(is.na(stan_data$var_yhat))
+    stan_data$var_yhat <- max(yhat,1)
   model <- stanmodels$combine_estimates
   fit <- rstan::sampling(model, data=stan_data, ...)
   theta <- rstan::extract(fit, "theta")$theta

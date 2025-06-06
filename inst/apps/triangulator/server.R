@@ -74,10 +74,18 @@ shinyServer(function(input, output) {
 
     prior_samp <- reactiveVal()
     output$prior <- renderPlot({
-        if(!valid_numeric(input$prior_median) || !valid_numeric(input$prior_q75))
-            return(NULL)
         transform <- get_transform()
         inv_transform <- get_inv_transform()
+        if(input$prior_type == "Uniform"){
+            if(valid_numeric(input$prior_lower) && valid_numeric(input$prior_upper)){
+                samp <- runif(50000, transform(input$prior_lower), transform(input$prior_upper))
+                samp <- inv_transform(samp)
+                prior_samp(samp)
+                return(ggplot() + geom_histogram(aes(x=samp), bins=100))
+            }
+            return(NULL)
+        } else if(!valid_numeric(input$prior_median) || !valid_numeric(input$prior_q75))
+            return(NULL)
 
         med <- transform(input$prior_median)
         q75 <- transform(input$prior_q75)
@@ -98,6 +106,8 @@ shinyServer(function(input, output) {
     output$prior_quant <- renderTable({
         if(is.null(prior_samp()))
             return(NULL)
+        if(input$prior_type == "Uniform")
+            return(NULL)
         q <- t(as.matrix(quantile(prior_samp(), probs = c(.05,.1,.2,.3,.4,.5,.6,.7,.8,.9,.95))))
         as.data.frame(q)
     })
@@ -105,20 +115,27 @@ shinyServer(function(input, output) {
     output$prior_summaries <- renderTable({
         if(is.null(prior_samp()))
             return(NULL)
+        if(input$prior_type == "Uniform")
+            return(NULL)
         s <- prior_samp()
         data.frame(Median=median(s), Mean=mean(s), `Standard Deviation`=sd(s))
     })
 
     observeEvent(input$run,{
-        if(!valid_numeric(input$prior_median) || !valid_numeric(input$prior_q75))
+        flat_prior <- input$prior_type == "Uniform"
+        if(!flat_prior && (!valid_numeric(input$prior_median) || !valid_numeric(input$prior_q75)))
             return(NULL)
         id <- showNotification("Running...", duration = NULL)
 
         transform <- get_transform()
         inv_transform <- get_inv_transform()
-
-        prior_med <- transform(input$prior_median)
-        prior_q75 <- transform(input$prior_q75)
+        if(flat_prior){
+          prior_med <- .5
+          prior_q75 <- .75
+        }else{
+            prior_med <- transform(input$prior_median)
+            prior_q75 <- transform(input$prior_q75)
+        }
         prior_sd <- (prior_q75 -prior_med) / .674
         df <- hot_to_r(input$hot)
         df <- df[!is.na(df$Estimate),]
@@ -132,6 +149,7 @@ shinyServer(function(input, output) {
         if(valid_numeric(input$prior_upper))
             high <- transform(input$prior_upper)
         multi <- input$multi
+        browser()
         post <- combine_estimates_stan(
             yhat,
             yhat_sd,
@@ -141,6 +159,7 @@ shinyServer(function(input, output) {
             low,
             high,
             multi,
+            flat_prior = flat_prior,
             iter=10000,
             thin=5)
         theta <- post$theta
@@ -156,23 +175,26 @@ shinyServer(function(input, output) {
         })
 
         output$post_plot <- renderPlot({
+            prior <- isolate(prior_samp())
+            if(is.null(prior)){
+                prior <- NA
+            }
             df2 <- rbind(
                 data.frame(`Population Value`=theta, Distribution="Posterior"),
-                data.frame(`Population Value`=isolate(prior_samp()), Distribution="Prior")
+                data.frame(`Population Value`=isolate(prior), Distribution="Prior")
             )
             p1 <- qplot(x= Population.Value, color=Distribution, data=df2, geom="density",trim=TRUE) +
                 ylab("Density") +
                 theme_bw() +
                 theme(legend.position = "bottom")
-            prior <- isolate(prior_samp())
             conf <- df$`Design Confidence`/100
             lsc <- transform(df$Estimate) - (transform(df$Estimate) - transform(df$Lower)) / conf
             usc <- transform(df$Estimate) + (transform(df$Upper) - transform(df$Estimate)) / conf
 
             forest_df <- data.frame(Name=factor(c('Prior',df$Name,'Consensus'),levels=rev(c('Prior',df$Name,'Consensus'))),
                                     Estimate = c(median(prior),df$Estimate,median(theta)),
-                                    Lower = c(quantile(prior,c(0.025,0.975))[['2.5%']],df$Lower,quantile(theta,c(0.025,0.975))[['2.5%']]),
-                                    Upper= c(quantile(prior,c(0.025,0.975))[['97.5%']],df$Upper,quantile(theta,c(0.025,0.975))[['97.5%']]),
+                                    Lower = c(quantile(prior,c(0.025,0.975),na.rm=TRUE)[['2.5%']],df$Lower,quantile(theta,c(0.025,0.975),na.rm=TRUE)[['2.5%']]),
+                                    Upper= c(quantile(prior,c(0.025,0.975),na.rm=TRUE)[['97.5%']],df$Upper,quantile(theta,c(0.025,0.975),na.rm=TRUE)[['97.5%']]),
                                     Type=c('#00BFC4',rep("#000000",nrow(df)),'#F8766D'),
                                     Lower_scaled = c(NA, inv_transform(lsc), NA),
                                     Upper_scaled = c(NA, inv_transform(usc), NA))
@@ -203,8 +225,8 @@ shinyServer(function(input, output) {
         })
 
         output$post_summaries <- renderTable({
-            if(is.null(prior_samp()))
-                return(NULL)
+            #if(is.null(prior_samp()))
+            #    return(NULL)
             s <- theta
             ci <- paste0("(", format(quantile(theta, .025), digits=2), ", ",format(quantile(theta, .975), digits=2),")")
             ci2 <- paste0("(", format(quantile(theta, .05), digits=2), ", ",format(quantile(theta, .95), digits=2),")")
@@ -216,6 +238,7 @@ shinyServer(function(input, output) {
             cat("Transform:", input$transform,"\n")
             cat("Multi:", input$multi, "\n")
             cat("Prior: "," : mu = ", med, " : q75 = ", input$prior_q75, "\n")
+            cat("Prior type: ", input$prior_type, "\n")
             cat("Prior Bounds: lower = ", input$prior_lower, " : upper = ", input$prior_upper,"\n")
             cat("Data:\n")
             df <- hot_to_r(input$hot)
