@@ -149,7 +149,6 @@ shinyServer(function(input, output) {
         if(valid_numeric(input$prior_upper))
             high <- transform(input$prior_upper)
         multi <- input$multi
-        browser()
         post <- combine_estimates_stan(
             yhat,
             yhat_sd,
